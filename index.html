@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TaskFlow - A sleek, responsive task board application built with pure HTML, CSS, and Vanilla JavaScript.">
+  <title>TaskFlow &bull; Modern Responsive Task Board</title>
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==========================================
+       Header & Navigation
+       ========================================== -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-section">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+            <path d="M14 9h4"></path>
+            <path d="M14 15h4"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">TaskFlow</h1>
+          <p class="brand-subtitle">Kanban Task Management</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- New Task Button -->
+        <button id="btn-open-add-task" class="btn btn-primary" title="Create a new task">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>New Task</span>
+        </button>
+
+        <!-- Import / Export Actions -->
+        <button id="btn-export-tasks" class="btn btn-secondary" title="Export tasks to JSON">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Export</span>
+        </button>
+
+        <button id="btn-import-trigger" class="btn btn-secondary" title="Import tasks from JSON">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>Import</span>
+        </button>
+        <input type="file" id="file-import-tasks" accept=".json" style="display: none;">
+
+        <!-- Clear Board -->
+        <button id="btn-clear-board" class="btn btn-icon btn-danger" title="Clear all tasks" aria-label="Clear all tasks">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+
+        <!-- Theme Toggle Button -->
+        <button id="btn-theme-toggle" class="btn-icon" title="Toggle Theme" aria-label="Toggle theme">
+          <svg id="icon-theme-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg id="icon-theme-light" style="display: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       App Toolbar & Realtime Metrics
+       ========================================== -->
+  <section class="app-toolbar" aria-label="Task metrics and filters">
+    <!-- Live Metrics Strip -->
+    <div class="metrics-strip">
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Total Tasks</h4>
+          <div id="stat-total" class="metric-value">0</div>
+        </div>
+        <div class="metric-icon-badge badge-total">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>In Progress</h4>
+          <div id="stat-progress" class="metric-value">0</div>
+        </div>
+        <div class="metric-icon-badge badge-progress">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Completed</h4>
+          <div id="stat-completed" class="metric-value">0%</div>
+        </div>
+        <div class="metric-icon-badge badge-completed">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Overdue</h4>
+          <div id="stat-overdue" class="metric-value">0</div>
+        </div>
+        <div class="metric-icon-badge badge-overdue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search, Filter & Sort Controls -->
+    <div class="controls-bar">
+      <!-- Search Input -->
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search-input" class="search-input" placeholder="Search tasks by title, description, or tag...">
+      </div>
+
+      <!-- Filters & Sorting -->
+      <div class="filter-group">
+        <!-- Priority Filter -->
+        <select id="filter-priority" class="custom-select" title="Filter by priority">
+          <option value="all">All Priorities</option>
+          <option value="urgent">Urgent</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+
+        <!-- Tag / Category Filter -->
+        <select id="filter-tag" class="custom-select" title="Filter by tag">
+          <option value="all">All Tags</option>
+        </select>
+
+        <!-- Sort Criteria -->
+        <select id="sort-by" class="custom-select" title="Sort tasks">
+          <option value="created-desc">Newest First</option>
+          <option value="created-asc">Oldest First</option>
+          <option value="due-date">Due Date</option>
+          <option value="priority">Priority (High to Low)</option>
+        </select>
+
+        <!-- Reset Button -->
+        <button id="btn-reset-filters" class="btn-text" title="Reset all filters">Reset Filters</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       Task Board & Columns
+       ========================================== -->
+  <main class="board-container" id="board-container">
+    <div class="board-columns" id="board-columns">
+      <!-- Column: To Do -->
+      <div class="board-column column-todo" data-column="todo">
+        <div class="column-header">
+          <div class="column-title-wrap">
+            <span class="column-dot"></span>
+            <h2 class="column-title">To Do</h2>
+            <span class="column-count" id="count-todo">0</span>
+          </div>
+          <div class="column-actions">
+            <button class="btn-col-add" data-column="todo" title="Add task to To Do">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+          </div>
+        </div>
+        <div class="task-list" id="list-todo" data-column="todo"></div>
+      </div>
+
+      <!-- Column: In Progress -->
+      <div class="board-column column-in-progress" data-column="in-progress">
+        <div class="column-header">
+          <div class="column-title-wrap">
+            <span class="column-dot"></span>
+            <h2 class="column-title">In Progress</h2>
+            <span class="column-count" id="count-in-progress">0</span>
+          </div>
+          <div class="column-actions">
+            <button class="btn-col-add" data-column="in-progress" title="Add task to In Progress">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+          </div>
+        </div>
+        <div class="task-list" id="list-in-progress" data-column="in-progress"></div>
+      </div>
+
+      <!-- Column: Under Review -->
+      <div class="board-column column-review" data-column="review">
+        <div class="column-header">
+          <div class="column-title-wrap">
+            <span class="column-dot"></span>
+            <h2 class="column-title">Under Review</h2>
+            <span class="column-count" id="count-review">0</span>
+          </div>
+          <div class="column-actions">
+            <button class="btn-col-add" data-column="review" title="Add task to Under Review">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+          </div>
+        </div>
+        <div class="task-list" id="list-review" data-column="review"></div>
+      </div>
+
+      <!-- Column: Completed -->
+      <div class="board-column column-completed" data-column="completed">
+        <div class="column-header">
+          <div class="column-title-wrap">
+            <span class="column-dot"></span>
+            <h2 class="column-title">Completed</h2>
+            <span class="column-count" id="count-completed">0</span>
+          </div>
+          <div class="column-actions">
+            <button class="btn-col-add" data-column="completed" title="Add task to Completed">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+          </div>
+        </div>
+        <div class="task-list" id="list-completed" data-column="completed"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==========================================
+       Task Modal (Add / Edit)
+       ========================================== -->
+  <div class="modal-overlay" id="task-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Create New Task</h3>
+        <button class="btn-close-modal" id="btn-close-task-modal" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <form id="task-form">
+        <div class="modal-body">
+          <input type="hidden" id="task-id">
+          
+          <!-- Title -->
+          <div class="form-group">
+            <label for="task-title-input" class="form-label">Task Title <span style="color: var(--priority-urgent)">*</span></label>
+            <input type="text" id="task-title-input" class="form-input" placeholder="e.g., Design checkout landing page" required autocomplete="off">
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="task-desc-input" class="form-label">Description</label>
+            <textarea id="task-desc-input" class="form-textarea" placeholder="Add detailed notes or requirements for this task..."></textarea>
+          </div>
+
+          <!-- Column & Priority Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="task-column-input" class="form-label">Board Column</label>
+              <select id="task-column-input" class="form-select">
+                <option value="todo">To Do</option>
+                <option value="in-progress">In Progress</option>
+                <option value="review">Under Review</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="task-priority-input" class="form-label">Priority</label>
+              <select id="task-priority-input" class="form-select">
+                <option value="low">🟢 Low</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="high">🟠 High</option>
+                <option value="urgent">🔴 Urgent</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Due Date & Tags Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="task-due-input" class="form-label">Due Date</label>
+              <input type="date" id="task-due-input" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label for="task-tags-input" class="form-label">Tags (comma separated)</label>
+              <input type="text" id="task-tags-input" class="form-input" placeholder="Design, Frontend, API">
+            </div>
+          </div>
+
+          <!-- Subtasks Checklist Builder -->
+          <div class="form-group">
+            <label class="form-label">Subtasks / Checklist</label>
+            <div class="subtasks-builder">
+              <div class="subtask-input-wrap">
+                <input type="text" id="subtask-new-input" class="form-input" placeholder="Add a checklist item...">
+                <button type="button" id="btn-add-subtask" class="btn btn-secondary">Add</button>
+              </div>
+              <div class="subtask-list-builder" id="subtask-list-builder">
+                <!-- Dynamically populated in modal -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-task">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-task">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       Confirmation Modal
+       ========================================== -->
+  <div class="modal-overlay" id="confirm-modal-overlay" aria-hidden="true" role="dialog">
+    <div class="modal-container" style="max-width: 440px;">
+      <div class="confirm-modal-content">
+        <div class="confirm-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        </div>
+        <h3 id="confirm-modal-title" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Are you sure?</h3>
+        <p id="confirm-modal-desc" style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">This action cannot be undone.</p>
+        <div style="display: flex; gap: 0.75rem; justify-content: center;">
+          <button class="btn btn-secondary" id="btn-confirm-cancel">Cancel</button>
+          <button class="btn btn-danger" id="btn-confirm-proceed">Confirm Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       Toast Container
+       ========================================== -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Main JavaScript App Logic -->
+  <script src="js/app.js"></script>
+</body>
+</html>
